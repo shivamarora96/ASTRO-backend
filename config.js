@@ -1,4 +1,4 @@
-var port = process.env.port || 80 ;
+var port = process.env.PORT || 80 ;
 var baseURL = 'http://blog.jyotishguru.com/';
 
 var config = {
