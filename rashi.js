@@ -17,7 +17,81 @@ var final = {
 	count: 0,
 }
 
+
+function getJSON_Again(){
+
+	final.status = false;
+	final.data = new Array();
+	final.date = " ";
+	final.count = 0;
+
+
+	console.log("Calling getJSON_Again");
+
+	request(config.url, function(err,response,html){
+
+
+		if(err){
+			console.log(err);
+			return final;
+		}
+
+
+		var $ = cheerio.load(html,{
+			ignoreWhitespace:false,
+		});
+		var todayRashi = $('.blog-posts').children().first().children();
+		var date = todayRashi.first().text();
+		final.date = date;
+
+
+
+
+		// console.log(final);	
+		var content = todayRashi.last();
+		var postbody = $('.post-body' , content).children().first().next().text();
+
+		var content_array = postbody.split('\n');
+		var i = 1;
+		var text= " ";
+		while(i <50 && final.count <=12){
+
+			var current = content_array[i];
+			
+			if(current.length > 5){
+				text = text + '\n \n' + current;
+			}
+			else{
+				var single = new Object();
+				single.index = final.count ;
+				single.date = date;
+				single.title = "ASTRO RASHIFAL";
+				single.content = text;
+				final.data.push(single);
+				final.count++; 
+				text = " ";
+
+				if(final.count == 12)
+					break;
+			}
+
+			// console.log(current);
+
+			i++;
+		}
+
+		final.status = true;
+
+		return final;
+	});
+
+}
+
+
+
 function getJSON(){
+
+	console.log('Calling getJSON ');
 
 	request(config.url, function(err,response,html){
 
@@ -72,11 +146,18 @@ function getJSON(){
 
 		final.status = true;
 
+
+	if(final.count!=12){
+		getJSON_Again();
+	}
+
+
 		return final;
 	});
 
 }
 
 getJSON();
+
 
 module.exports.final = final;
